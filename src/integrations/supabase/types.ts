@@ -9,7 +9,286 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      bookings: {
+        Row: {
+          address: string
+          amount: number
+          city: string
+          created_at: string
+          id: string
+          pandit_id: string
+          payment_id: string | null
+          payment_status: string
+          scheduled_date: string
+          scheduled_time: string
+          service_id: string
+          special_instructions: string | null
+          state: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          address: string
+          amount: number
+          city: string
+          created_at?: string
+          id?: string
+          pandit_id: string
+          payment_id?: string | null
+          payment_status?: string
+          scheduled_date: string
+          scheduled_time: string
+          service_id: string
+          special_instructions?: string | null
+          state: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          address?: string
+          amount?: number
+          city?: string
+          created_at?: string
+          id?: string
+          pandit_id?: string
+          payment_id?: string | null
+          payment_status?: string
+          scheduled_date?: string
+          scheduled_time?: string
+          service_id?: string
+          special_instructions?: string | null
+          state?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bookings_pandit_id_fkey"
+            columns: ["pandit_id"]
+            isOneToOne: false
+            referencedRelation: "pandit_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bookings_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bookings_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pandit_profiles: {
+        Row: {
+          address: string
+          availability_hours: Json | null
+          avatar_url: string | null
+          bio: string | null
+          city: string
+          created_at: string
+          email: string
+          experience_years: number | null
+          full_name: string
+          id: string
+          languages: string[] | null
+          phone: string
+          rating: number | null
+          review_count: number | null
+          specializations: string[] | null
+          state: string
+          updated_at: string
+          verification_status: string | null
+        }
+        Insert: {
+          address: string
+          availability_hours?: Json | null
+          avatar_url?: string | null
+          bio?: string | null
+          city: string
+          created_at?: string
+          email: string
+          experience_years?: number | null
+          full_name: string
+          id: string
+          languages?: string[] | null
+          phone: string
+          rating?: number | null
+          review_count?: number | null
+          specializations?: string[] | null
+          state: string
+          updated_at?: string
+          verification_status?: string | null
+        }
+        Update: {
+          address?: string
+          availability_hours?: Json | null
+          avatar_url?: string | null
+          bio?: string | null
+          city?: string
+          created_at?: string
+          email?: string
+          experience_years?: number | null
+          full_name?: string
+          id?: string
+          languages?: string[] | null
+          phone?: string
+          rating?: number | null
+          review_count?: number | null
+          specializations?: string[] | null
+          state?: string
+          updated_at?: string
+          verification_status?: string | null
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          address: string | null
+          avatar_url: string | null
+          city: string | null
+          created_at: string
+          email: string | null
+          full_name: string | null
+          id: string
+          phone: string | null
+          state: string | null
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          avatar_url?: string | null
+          city?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id: string
+          phone?: string | null
+          state?: string | null
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          avatar_url?: string | null
+          city?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          phone?: string | null
+          state?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      reviews: {
+        Row: {
+          booking_id: string
+          comment: string | null
+          created_at: string
+          id: string
+          pandit_id: string
+          rating: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          booking_id: string
+          comment?: string | null
+          created_at?: string
+          id?: string
+          pandit_id: string
+          rating: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          booking_id?: string
+          comment?: string | null
+          created_at?: string
+          id?: string
+          pandit_id?: string
+          rating?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reviews_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reviews_pandit_id_fkey"
+            columns: ["pandit_id"]
+            isOneToOne: false
+            referencedRelation: "pandit_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reviews_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      services: {
+        Row: {
+          category: string | null
+          created_at: string
+          description: string | null
+          duration: number
+          id: string
+          name: string
+          pandit_id: string
+          price: number
+          updated_at: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          duration: number
+          id?: string
+          name: string
+          pandit_id: string
+          price: number
+          updated_at?: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          duration?: number
+          id?: string
+          name?: string
+          pandit_id?: string
+          price?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "services_pandit_id_fkey"
+            columns: ["pandit_id"]
+            isOneToOne: false
+            referencedRelation: "pandit_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
