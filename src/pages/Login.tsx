@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -9,7 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Radio, RadioGroup, RadioIndicator, RadioLabel } from "@/components/ui/radio";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useAuth } from "@/contexts/AuthContext";
 
 const Login = () => {
@@ -234,34 +233,24 @@ const Login = () => {
                 
                 <div className="grid gap-2">
                   <Label className="dark:text-gray-300">I want to use PoojaConnect as:</Label>
-                  <div className="flex flex-col gap-2">
+                  <RadioGroup 
+                    value={selectedRole}
+                    onValueChange={(value) => setSelectedRole(value as "user" | "pandit")}
+                    className="flex flex-col space-y-2"
+                  >
                     <div className="flex items-center space-x-2">
-                      <input
-                        type="radio"
-                        id="role-user"
-                        value="user"
-                        checked={selectedRole === "user"}
-                        onChange={() => setSelectedRole("user")}
-                        className="h-4 w-4 text-orange-600"
-                      />
-                      <label htmlFor="role-user" className="dark:text-gray-300">
+                      <RadioGroupItem id="role-user" value="user" />
+                      <Label htmlFor="role-user" className="dark:text-gray-300">
                         A User (looking for pandit services)
-                      </label>
+                      </Label>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <input
-                        type="radio"
-                        id="role-pandit"
-                        value="pandit"
-                        checked={selectedRole === "pandit"}
-                        onChange={() => setSelectedRole("pandit")}
-                        className="h-4 w-4 text-orange-600"
-                      />
-                      <label htmlFor="role-pandit" className="dark:text-gray-300">
+                      <RadioGroupItem id="role-pandit" value="pandit" />
+                      <Label htmlFor="role-pandit" className="dark:text-gray-300">
                         A Pandit (offering services)
-                      </label>
+                      </Label>
                     </div>
-                  </div>
+                  </RadioGroup>
                 </div>
                 
                 <Button
