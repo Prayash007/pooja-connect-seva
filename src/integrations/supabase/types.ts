@@ -100,6 +100,7 @@ export type Database = {
           experience_years: number | null
           full_name: string
           id: string
+          is_available: boolean | null
           languages: string[] | null
           phone: string
           rating: number | null
@@ -120,6 +121,7 @@ export type Database = {
           experience_years?: number | null
           full_name: string
           id: string
+          is_available?: boolean | null
           languages?: string[] | null
           phone: string
           rating?: number | null
@@ -140,6 +142,7 @@ export type Database = {
           experience_years?: number | null
           full_name?: string
           id?: string
+          is_available?: boolean | null
           languages?: string[] | null
           phone?: string
           rating?: number | null
@@ -154,37 +157,49 @@ export type Database = {
       profiles: {
         Row: {
           address: string | null
+          age: number | null
           avatar_url: string | null
           city: string | null
           created_at: string
           email: string | null
           full_name: string | null
           id: string
+          marital_status: string | null
           phone: string | null
+          role: string | null
+          sex: string | null
           state: string | null
           updated_at: string
         }
         Insert: {
           address?: string | null
+          age?: number | null
           avatar_url?: string | null
           city?: string | null
           created_at?: string
           email?: string | null
           full_name?: string | null
           id: string
+          marital_status?: string | null
           phone?: string | null
+          role?: string | null
+          sex?: string | null
           state?: string | null
           updated_at?: string
         }
         Update: {
           address?: string | null
+          age?: number | null
           avatar_url?: string | null
           city?: string | null
           created_at?: string
           email?: string | null
           full_name?: string | null
           id?: string
+          marital_status?: string | null
           phone?: string | null
+          role?: string | null
+          sex?: string | null
           state?: string | null
           updated_at?: string
         }

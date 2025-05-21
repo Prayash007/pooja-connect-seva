@@ -1,6 +1,6 @@
 
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
@@ -9,38 +9,32 @@ import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Radio, RadioGroup, RadioIndicator, RadioLabel } from "@/components/ui/radio";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Login = () => {
-  const location = useLocation();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user, userRole } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  
-  // Get the selected role from location state or default to user
-  const selectedRole = location.state?.selectedRole || "user";
+  const [selectedRole, setSelectedRole] = useState<"user" | "pandit">("user");
 
   useEffect(() => {
-    localStorage.setItem("userRole", selectedRole);
-    
-    // Check if user is already logged in
-    const checkUser = async () => {
-      const { data } = await supabase.auth.getSession();
-      if (data.session) {
-        // Check if the user is a new pandit who needs to register
-        if (selectedRole === "pandit") {
-          navigate("/pandit-dashboard");
-        } else {
-          navigate("/user-home");
-        }
+    // If user is already logged in, redirect based on role
+    if (user) {
+      if (!userRole) {
+        navigate("/select-role");
+      } else if (userRole === "user") {
+        navigate("/user-home");
+      } else if (userRole === "pandit") {
+        navigate("/pandit-dashboard");
       }
-    };
-    
-    checkUser();
-  }, [selectedRole, navigate]);
+    }
+  }, [user, userRole, navigate]);
 
-  const handleEmailSignIn = async (e) => {
+  const handleEmailSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       setIsLoading(true);
@@ -56,15 +50,8 @@ const Login = () => {
         title: "Successfully signed in!",
         description: "Welcome to PoojaConnect",
       });
-
-      // Check if the user is a pandit or user based on role
-      if (selectedRole === "pandit") {
-        navigate("/pandit-dashboard");
-      } else {
-        navigate("/user-home");
-      }
       
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: "Authentication failed",
         description: error.message || "There was an error signing in",
@@ -75,7 +62,7 @@ const Login = () => {
     }
   };
 
-  const handleEmailSignUp = async (e) => {
+  const handleEmailSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       setIsLoading(true);
@@ -85,20 +72,27 @@ const Login = () => {
         password,
         options: {
           data: {
-            full_name: "",
-            role: selectedRole,
+            role: selectedRole
           }
         }
       });
       
       if (error) throw error;
       
+      // Create profile entry for the new user
+      if (data.user) {
+        await supabase
+          .from("profiles")
+          .update({ role: selectedRole })
+          .eq("id", data.user.id);
+      }
+      
       toast({
         title: "Account created!",
         description: "Please check your email for confirmation",
       });
       
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: "Registration failed",
         description: error.message || "There was an error creating your account",
@@ -126,7 +120,7 @@ const Login = () => {
       
       if (error) throw error;
       
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: "Authentication failed",
         description: error.message || "There was an error signing in",
@@ -142,7 +136,7 @@ const Login = () => {
         <CardHeader className="text-center">
           <CardTitle className="text-2xl text-orange-800 dark:text-orange-400">Sign In</CardTitle>
           <CardDescription className="dark:text-gray-400">
-            Signing in as {selectedRole === "pandit" ? "a Pandit" : "a User"}
+            Sign in to PoojaConnect
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -238,6 +232,38 @@ const Login = () => {
                   <p className="text-xs text-gray-500 dark:text-gray-400">Password must be at least 6 characters</p>
                 </div>
                 
+                <div className="grid gap-2">
+                  <Label className="dark:text-gray-300">I want to use PoojaConnect as:</Label>
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="radio"
+                        id="role-user"
+                        value="user"
+                        checked={selectedRole === "user"}
+                        onChange={() => setSelectedRole("user")}
+                        className="h-4 w-4 text-orange-600"
+                      />
+                      <label htmlFor="role-user" className="dark:text-gray-300">
+                        A User (looking for pandit services)
+                      </label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="radio"
+                        id="role-pandit"
+                        value="pandit"
+                        checked={selectedRole === "pandit"}
+                        onChange={() => setSelectedRole("pandit")}
+                        className="h-4 w-4 text-orange-600"
+                      />
+                      <label htmlFor="role-pandit" className="dark:text-gray-300">
+                        A Pandit (offering services)
+                      </label>
+                    </div>
+                  </div>
+                </div>
+                
                 <Button
                   type="submit"
                   disabled={isLoading}
@@ -260,7 +286,7 @@ const Login = () => {
         onClick={() => navigate("/")}
         className="mt-4 text-orange-800 dark:text-orange-400"
       >
-        Go back to role selection
+        Go back to home
       </Button>
     </div>
   );

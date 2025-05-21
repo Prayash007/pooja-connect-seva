@@ -1,204 +1,154 @@
 
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { useIsMobile } from "@/hooks/use-mobile";
-import { useToast } from "@/hooks/use-toast";
-import { Calendar, User, LogOut, Menu, X, Moon, Sun, Settings, Home } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Bell, Menu, User } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { useAuth } from "@/contexts/AuthContext";
 
-export const PanditLayout = ({ children }: { children: React.ReactNode }) => {
-  const isMobile = useIsMobile();
+interface PanditLayoutProps {
+  children: React.ReactNode;
+}
+
+export const PanditLayout = ({ children }: PanditLayoutProps) => {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const navigate = useNavigate();
-  const { toast } = useToast();
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
-
-  const toggleDarkMode = () => {
-    setDarkMode(!darkMode);
-    // This would be implemented with a proper theme system
-    document.documentElement.classList.toggle('dark');
-  };
-
-  const handleLogout = () => {
-    // Mock logout - would be replaced with actual Supabase auth
-    localStorage.removeItem("isAuthenticated");
-    localStorage.removeItem("userRole");
-    
-    toast({
-      title: "Logged out successfully",
-      description: "You have been logged out of your account",
-    });
-    
-    navigate("/");
-  };
+  const { user, signOut } = useAuth();
 
   return (
-    <div className={`min-h-screen flex flex-col ${darkMode ? 'dark' : ''}`}>
-      {/* Header */}
-      <header className="bg-white border-b border-orange-200 sticky top-0 z-10 shadow-sm">
-        <div className="container mx-auto px-4 py-3 flex justify-between items-center">
-          <Link to="/pandit-dashboard" className="flex items-center">
-            <span className="text-2xl font-bold text-orange-700">PoojaConnect</span>
-            <span className="text-sm bg-orange-100 text-orange-800 px-2 py-0.5 rounded ml-2">Pandit</span>
-          </Link>
-          
-          {isMobile ? (
-            <>
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                onClick={() => setMenuOpen(!menuOpen)}
-                className="text-orange-800"
-              >
-                {menuOpen ? <X /> : <Menu />}
-              </Button>
-              
-              {/* Mobile Menu */}
-              {menuOpen && (
-                <div className="absolute top-full left-0 right-0 bg-white border-b border-orange-200 shadow-md">
-                  <nav className="flex flex-col p-4 space-y-4">
-                    <Link 
-                      to="/pandit-dashboard" 
-                      className="flex items-center gap-2 text-orange-800 hover:text-orange-600 py-2"
-                      onClick={() => setMenuOpen(false)}
-                    >
-                      <Home size={20} />
-                      <span>Dashboard</span>
-                    </Link>
-                    <Link 
-                      to="/pandit-bookings" 
-                      className="flex items-center gap-2 text-orange-800 hover:text-orange-600 py-2"
-                      onClick={() => setMenuOpen(false)}
-                    >
-                      <Calendar size={20} />
-                      <span>Bookings</span>
-                    </Link>
-                    <Link 
-                      to="/pandit-profile" 
-                      className="flex items-center gap-2 text-orange-800 hover:text-orange-600 py-2"
-                      onClick={() => setMenuOpen(false)}
-                    >
-                      <User size={20} />
-                      <span>Profile</span>
-                    </Link>
-                    <Link 
-                      to="/pandit-settings" 
-                      className="flex items-center gap-2 text-orange-800 hover:text-orange-600 py-2"
-                      onClick={() => setMenuOpen(false)}
-                    >
-                      <Settings size={20} />
-                      <span>Settings</span>
-                    </Link>
-                    <div className="border-t border-gray-200 pt-2">
-                      <Button 
-                        variant="ghost" 
-                        className="flex w-full justify-start items-center gap-2 text-orange-800 hover:text-orange-600 py-2"
-                        onClick={toggleDarkMode}
-                      >
-                        {darkMode ? <Sun size={20} /> : <Moon size={20} />}
-                        <span>{darkMode ? 'Light Mode' : 'Dark Mode'}</span>
-                      </Button>
-                      <Button 
-                        variant="ghost" 
-                        className="flex w-full justify-start items-center gap-2 text-red-600 hover:text-red-800 py-2"
-                        onClick={handleLogout}
-                      >
-                        <LogOut size={20} />
-                        <span>Logout</span>
-                      </Button>
-                    </div>
-                  </nav>
-                </div>
-              )}
-            </>
-          ) : (
-            <div className="flex items-center gap-4">
-              <nav className="flex items-center gap-6">
-                <Link 
-                  to="/pandit-dashboard" 
-                  className="flex items-center gap-1 text-orange-800 hover:text-orange-600"
+    <div className="min-h-screen bg-white dark:bg-gray-950 flex flex-col">
+      {/* Top Navigation Bar */}
+      <header className="sticky top-0 z-40 bg-white dark:bg-gray-950 border-b border-gray-200 dark:border-gray-800">
+        <div className="container flex h-16 items-center justify-between py-4">
+          <div className="flex items-center gap-2 md:gap-4">
+            {/* Mobile menu button */}
+            <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
+              <SheetTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="md:hidden"
                 >
-                  <Home size={18} />
-                  <span>Dashboard</span>
-                </Link>
-                <Link 
-                  to="/pandit-bookings" 
-                  className="flex items-center gap-1 text-orange-800 hover:text-orange-600"
-                >
-                  <Calendar size={18} />
-                  <span>Bookings</span>
-                </Link>
-                <Link 
-                  to="/pandit-profile" 
-                  className="flex items-center gap-1 text-orange-800 hover:text-orange-600"
-                >
-                  <User size={18} />
-                  <span>Profile</span>
-                </Link>
-                <Link 
-                  to="/pandit-settings" 
-                  className="flex items-center gap-1 text-orange-800 hover:text-orange-600"
-                >
-                  <Settings size={18} />
-                  <span>Settings</span>
-                </Link>
-              </nav>
-              
-              <div className="flex items-center gap-2">
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  onClick={toggleDarkMode}
-                  className="text-orange-800"
-                >
-                  {darkMode ? <Sun size={20} /> : <Moon size={20} />}
+                  <Menu className="h-5 w-5" />
+                  <span className="sr-only">Toggle menu</span>
                 </Button>
-                <Button 
-                  variant="outline" 
-                  className="border-orange-600 text-orange-800"
-                  onClick={handleLogout}
-                >
-                  <LogOut className="mr-2 h-4 w-4" />
-                  Logout
-                </Button>
-              </div>
+              </SheetTrigger>
+              <SheetContent side="left" className="w-64">
+                <nav className="grid gap-6 text-lg font-medium">
+                  <div
+                    className="flex items-center gap-2 font-semibold cursor-pointer"
+                    onClick={() => {
+                      setSidebarOpen(false);
+                      navigate("/pandit-dashboard");
+                    }}
+                  >
+                    <span className="text-orange-600 dark:text-orange-500">🕉️</span>
+                    PoojaConnect
+                  </div>
+                  <Button
+                    variant="ghost"
+                    className="flex justify-start px-2"
+                    onClick={() => {
+                      setSidebarOpen(false);
+                      navigate("/pandit-dashboard");
+                    }}
+                  >
+                    Dashboard
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    className="flex justify-start px-2"
+                    onClick={() => {
+                      setSidebarOpen(false);
+                      navigate("/pandit-profile");
+                    }}
+                  >
+                    My Profile
+                  </Button>
+                </nav>
+              </SheetContent>
+            </Sheet>
+            
+            {/* Logo - always visible */}
+            <div
+              className="flex items-center gap-2 cursor-pointer"
+              onClick={() => navigate("/pandit-dashboard")}
+            >
+              <span className="text-orange-600 dark:text-orange-500 text-2xl">🕉️</span>
+              <span className="font-semibold hidden md:block">PoojaConnect</span>
             </div>
-          )}
+          </div>
+          
+          {/* Desktop Navigation - hidden on mobile */}
+          <nav className="hidden md:flex items-center gap-6">
+            <Button
+              variant="ghost"
+              onClick={() => navigate("/pandit-dashboard")}
+            >
+              Dashboard
+            </Button>
+          </nav>
+          
+          {/* Right side items */}
+          <div className="flex items-center gap-3">
+            <Button variant="ghost" size="icon" className="text-gray-500 dark:text-gray-400">
+              <Bell className="h-5 w-5" />
+              <span className="sr-only">Notifications</span>
+            </Button>
+            
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src="" alt="Pandit avatar" />
+                    <AvatarFallback className="bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200">
+                      <User className="h-4 w-4" />
+                    </AvatarFallback>
+                  </Avatar>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56" align="end" forceMount>
+                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => navigate("/pandit-profile")}>Profile</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate("/pandit-dashboard")}>Dashboard</DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={signOut}>Log out</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
       </header>
       
-      {/* Main Content */}
-      <main className="flex-grow bg-orange-50">{children}</main>
+      {/* Main Content Area */}
+      <main className="flex-1">{children}</main>
       
-      {/* Footer - displayed only on larger screens or made compact on mobile */}
-      <footer className="bg-orange-800 text-white py-4 px-4">
-        <div className="container mx-auto">
-          {isMobile ? (
-            <div className="text-center">
-              <p className="text-sm">© 2025 PoojaConnect. All rights reserved.</p>
-            </div>
-          ) : (
-            <div className="flex justify-between items-center">
-              <div>
-                <h3 className="font-bold text-xl mb-2">PoojaConnect</h3>
-                <p className="text-orange-200">Connecting devotees with authentic pandits</p>
-              </div>
-              <div className="text-sm">
-                <div className="grid grid-cols-2 gap-x-8 gap-y-2">
-                  <Link to="#" className="hover:underline">About Us</Link>
-                  <Link to="#" className="hover:underline">Terms of Service</Link>
-                  <Link to="#" className="hover:underline">Contact</Link>
-                  <Link to="#" className="hover:underline">Privacy Policy</Link>
-                  <Link to="#" className="hover:underline">FAQs</Link>
-                  <Link to="#" className="hover:underline">Support</Link>
-                </div>
-              </div>
-              <div>
-                <p>© 2025 PoojaConnect</p>
-                <p className="text-orange-200 text-sm">All rights reserved</p>
-              </div>
-            </div>
-          )}
+      {/* Footer */}
+      <footer className="border-t border-gray-200 dark:border-gray-800 py-6 bg-gray-50 dark:bg-gray-900">
+        <div className="container flex flex-col md:flex-row justify-between items-center gap-4">
+          <div className="text-sm text-gray-500 dark:text-gray-400">
+            © 2025 PoojaConnect. All rights reserved.
+          </div>
+          <div className="flex gap-4">
+            <Button variant="link" className="text-sm text-gray-500 dark:text-gray-400 h-auto p-0">
+              Terms of Service
+            </Button>
+            <Button variant="link" className="text-sm text-gray-500 dark:text-gray-400 h-auto p-0">
+              Privacy Policy
+            </Button>
+            <Button variant="link" className="text-sm text-gray-500 dark:text-gray-400 h-auto p-0">
+              Contact Us
+            </Button>
+          </div>
         </div>
       </footer>
     </div>
