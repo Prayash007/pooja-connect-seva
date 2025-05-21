@@ -102,7 +102,7 @@ const Login = () => {
     }
   };
 
-  const handleGoogleSignIn = async () => {
+  const handleGoogleSignIn = async (isSignUp = false) => {
     try {
       setIsLoading(true);
       
@@ -114,6 +114,12 @@ const Login = () => {
             access_type: 'offline',
             prompt: 'consent',
           },
+          // If signing up, pass the selected role
+          ...(isSignUp && {
+            data: {
+              role: selectedRole
+            }
+          })
         },
       });
       
@@ -191,7 +197,7 @@ const Login = () => {
               </div>
               
               <Button
-                onClick={handleGoogleSignIn}
+                onClick={() => handleGoogleSignIn(false)}
                 variant="outline"
                 disabled={isLoading}
                 className="w-full h-10 flex items-center justify-center gap-2 border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700"
@@ -261,6 +267,25 @@ const Login = () => {
                   {isLoading ? "Creating account..." : "Create Account"}
                 </Button>
               </form>
+
+              <div className="relative my-4">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-300 dark:border-gray-700"></div>
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="px-2 bg-white dark:bg-gray-900 text-gray-500 dark:text-gray-400">or</span>
+                </div>
+              </div>
+              
+              <Button
+                onClick={() => handleGoogleSignIn(true)}
+                variant="outline"
+                disabled={isLoading}
+                className="w-full h-10 flex items-center justify-center gap-2 border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700"
+              >
+                <FcGoogle className="h-5 w-5" />
+                <span>Sign up with Google</span>
+              </Button>
             </TabsContent>
           </Tabs>
           
